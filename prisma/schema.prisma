@@ -1,0 +1,32 @@
+datasource db {
+  provider = "postgresql"
+  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+}
+
+generator client {
+  provider = "prisma-client-js"
+  engineType = "library"
+}
+
+// enum removed for SQLite compatibility
+
+model Lot {
+  id          Int       @id @default(autoincrement())
+  slug        String    @unique // e.g., "lote-12", used in Panoee links
+  number      String    // Visual number "12"
+  price       Decimal
+  currency    String    @default("USD")
+  status      String    @default("AVAILABLE") // SQLite doesn't support enums natively
+  dimensions  String    // "12m x 30m"
+  area        Int       // m2
+  description String?
+  imageUrl    String?   // Render or photo of the specific view
+
+  updatedAt   DateTime  @updatedAt
+}
+
+model Config {
+  key   String @id
+  value String // JSON string for flexibility
+}
