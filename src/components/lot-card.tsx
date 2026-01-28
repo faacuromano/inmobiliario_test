@@ -65,7 +65,9 @@ export function LotCard({
       transition={{ type: "spring", damping: 25, stiffness: 300 }}
       className={clsx(
         "relative overflow-hidden w-full mx-auto",
-        isEmbed ? "h-full flex flex-col bg-white/90 backdrop-blur-xl" : "glass rounded-2xl p-6 sm:p-8 max-w-md shadow-2xl border border-white/20"
+        isEmbed 
+          ? "h-full flex flex-col bg-white/95 backdrop-blur-2xl sm:rounded-2xl border border-white/20 shadow-2xl" 
+          : "glass rounded-2xl p-6 sm:p-8 max-w-md shadow-2xl border border-white/20"
       )}
     >
       {/* Decorative background glow - Only for Card Mode */}
