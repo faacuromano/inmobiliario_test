@@ -18,9 +18,17 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-cream selection:bg-forest/30 overflow-x-hidden">
       
+      {/* GLOBAL NOISE TEXTURE */}
+      <div className="fixed inset-0 bg-noise opacity-[0.03] pointer-events-none z-50 mix-blend-overlay" />
+
       {/* 1. HERO SECTION */}
       <section className="relative w-full min-h-screen flex flex-col items-center justify-center p-4 md:p-8 lg:p-12">
         
+        {/* Diagonal Background Split */}
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+           <div className="absolute top-0 right-0 w-[60vw] h-full bg-forest/5 skew-x-12 origin-top-right translate-x-20" />
+        </div>
+
         {/* Background Gradients */}
         <div className="absolute inset-0 pointer-events-none">
            <motion.div 
@@ -68,10 +76,10 @@ export default function Home() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="text-5xl md:text-7xl lg:text-8xl font-bold text-dark-green font-heading leading-[0.9] tracking-tight"
+              className="text-5xl md:text-7xl lg:text-8xl font-bold text-dark-green font-heading leading-[0.9] tracking-tight relative"
             >
               Viví tu <br/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-forest to-dark-green">Naturaleza</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-forest to-dark-green relative z-10">Naturaleza</span>
             </motion.h1>
 
             <motion.p 
@@ -123,8 +131,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 2. CONCEPT SECTION (Diagonal Cut) */}
-      <section id="about" className="py-32 relative diagonal-top bg-white/50 -mt-16 z-20">
+      {/* 2. CONCEPT SECTION (Diagonal Cut + Texture) */}
+      <section id="about" className="py-32 relative diagonal-top bg-cream -mt-16 z-20">
+         <div className="absolute inset-0 bg-grid-pattern opacity-[0.4] pointer-events-none" />
+         
          <motion.div 
            initial={{ opacity: 0, y: 50 }}
            whileInView={{ opacity: 1, y: 0 }}
@@ -148,9 +158,9 @@ export default function Home() {
          <div className="absolute bottom-0 right-0 w-96 h-96 bg-gold/5 rounded-full blur-3xl translate-y-1/3 translate-x-1/3" />
       </section>
 
-      {/* 3. DETAILS GRID (Asymmetric) */}
+      {/* 3. DETAILS GRID (Symmetric) */}
       <section className="py-24 bg-cream relative z-10">
-          <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+          <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 items-start">
               <motion.div 
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -170,8 +180,9 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.2 }}
-                className="group p-8 rounded-[3rem] bg-dark-green text-cream shadow-xl hover:shadow-2xl transition-all hover:-translate-y-2 md:-mt-8"
+                className="group p-8 rounded-[3rem] bg-dark-green text-cream shadow-xl hover:shadow-2xl transition-all hover:-translate-y-2 relative z-10"
               >
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -translate-y-10 translate-x-10 pointer-events-none" />
                   <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center text-gold mb-6 group-hover:scale-110 transition-transform -rotate-3 group-hover:-rotate-6">
                       <Trees size={28} />
                   </div>
@@ -195,9 +206,9 @@ export default function Home() {
           </div>
       </section>
 
-      {/* 4. CONTACT SECTION (Diagonal Bottom) */}
+      {/* 4. CONTACT SECTION (Diagonal Bottom + Noise) */}
       <section className="py-32 px-6 flex flex-col items-center justify-center text-center relative overflow-hidden bg-forest/5 diagonal-top">
-          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 mix-blend-multiply" />
+          <div className="absolute inset-0 bg-noise opacity-40 mix-blend-multiply pointer-events-none" />
           
           <motion.div 
              initial={{ opacity: 0, scale: 0.9 }}
