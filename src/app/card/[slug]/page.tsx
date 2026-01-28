@@ -44,7 +44,9 @@ export default async function LotPage({ params, searchParams }: PageProps) {
              </Link>
           )}
           
-          <LotView lot={{
+          <LotView 
+            isEmbed={isEmbed}
+            lot={{
             ...lot,
             price: Number(lot.price),
           }} />

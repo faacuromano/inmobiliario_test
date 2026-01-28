@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { ChevronUp } from "lucide-react";
 
 interface LotViewProps {
+  isEmbed?: boolean;
   lot: {
     number: string;
     price: number | string; // Handle decimal/string from Prisma
@@ -17,7 +18,7 @@ interface LotViewProps {
   };
 }
 
-export function LotView({ lot }: LotViewProps) {
+export function LotView({ lot, isEmbed = false }: LotViewProps) {
   const [isMobile, setIsMobile] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -28,11 +29,11 @@ export function LotView({ lot }: LotViewProps) {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Desktop View: Floating Card
-  if (!isMobile) {
+  // Desktop View OR Embed Mode: Floating/Static Card
+  if (!isMobile || isEmbed) {
     return (
-      <div className="absolute inset-0 pointer-events-none flex items-center justify-center p-4 z-10">
-        <div className="pointer-events-auto w-full max-w-md">
+      <div className={isEmbed ? "w-full h-full flex items-center justify-center p-2" : "absolute inset-0 pointer-events-none flex items-center justify-center p-4 z-10"}>
+        <div className={`pointer-events-auto w-full ${isEmbed ? 'max-w-xs' : 'max-w-md'}`}>
           <LotCard
             number={lot.number}
             price={Number(lot.price)}
