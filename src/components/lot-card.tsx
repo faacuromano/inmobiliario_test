@@ -67,7 +67,7 @@ export function LotCard({
         "relative overflow-hidden w-full mx-auto",
         isEmbed 
           ? "h-full flex flex-col bg-transparent" // Transparent because parent is likely white, or we use our own white without borders
-          : "glass rounded-2xl p-6 sm:p-8 max-w-md shadow-2xl border border-white/20"
+          : "glass rounded-2xl p-4 sm:p-8 max-w-md shadow-2xl border border-white/20"
       )}
     >
       {/* Decorative background glow - Only for Card Mode */}
@@ -138,14 +138,14 @@ export function LotCard({
          </div>
       ) : (
         // === STANDARD CARD MODE (LIGHT/GLASS) ===
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
            {/* Header */}
           <div className="flex justify-between items-start">
             <div>
-              <div className="text-xs font-semibold tracking-wider text-forest/70 uppercase mb-1">
+              <div className="text-[10px] sm:text-xs font-semibold tracking-wider text-forest/70 uppercase mb-1">
                 Lote N°
               </div>
-              <h2 className="text-4xl font-bold font-heading text-dark-green">
+              <h2 className="text-3xl sm:text-4xl font-bold font-heading text-dark-green">
                 {number}
               </h2>
             </div>
@@ -153,7 +153,7 @@ export function LotCard({
             {onClose && (
               <button 
                 onClick={onClose}
-                className="p-2 rounded-full hover:bg-black/5 transition-colors text-dark-green/60 hover:text-dark-green cursor-pointer"
+                className="p-1.5 sm:p-2 rounded-full hover:bg-black/5 transition-colors text-dark-green/60 hover:text-dark-green cursor-pointer"
               >
                 <X size={20} />
               </button>
@@ -162,7 +162,7 @@ export function LotCard({
 
           {/* Status Badge */}
           <div className={clsx(
-            "inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm font-medium",
+            "inline-flex items-center gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border text-xs sm:text-sm font-medium",
             config.bg, config.color, config.border
           )}>
             <StatusIcon size={14} />
@@ -170,43 +170,43 @@ export function LotCard({
           </div>
 
           {/* Specs Grid */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-white/40 rounded-xl p-2.5 border border-white/30">
-              <div className="flex items-center gap-2 text-dark-green/60 text-xs mb-1">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
+            <div className="bg-white/40 rounded-xl p-2 sm:p-2.5 border border-white/30">
+              <div className="flex items-center gap-1.5 sm:gap-2 text-dark-green/60 text-[10px] sm:text-xs mb-0.5 sm:mb-1">
                 <Ruler size={12} />
                 <span>Dimensiones</span>
               </div>
-              <div className="font-semibold text-dark-green text-sm">{dimensions}</div>
+              <div className="font-semibold text-dark-green text-xs sm:text-sm">{dimensions}</div>
             </div>
-            <div className="bg-white/40 rounded-xl p-2.5 border border-white/30">
-              <div className="flex items-center gap-2 text-dark-green/60 text-xs mb-1">
+            <div className="bg-white/40 rounded-xl p-2 sm:p-2.5 border border-white/30">
+              <div className="flex items-center gap-1.5 sm:gap-2 text-dark-green/60 text-[10px] sm:text-xs mb-0.5 sm:mb-1">
                 <Maximize size={12} />
                 <span>Superficie</span>
               </div>
-              <div className="font-semibold text-dark-green text-sm">{area} m²</div>
+              <div className="font-semibold text-dark-green text-xs sm:text-sm">{area} m²</div>
             </div>
           </div>
 
           {/* Price Section */}
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             {status === "AVAILABLE" && (
               <div>
-                <div className="text-xs text-dark-green/60 mb-1">Precio de Lista</div>
-                <div className="text-3xl font-bold font-heading text-forest">
+                <div className="text-[10px] sm:text-xs text-dark-green/60 mb-0.5 sm:mb-1">Precio de Lista</div>
+                <div className="text-2xl sm:text-3xl font-bold font-heading text-forest">
                   {currency} {price.toLocaleString()}
                 </div>
               </div>
             )}
 
             {description && (
-              <p className="text-sm text-dark-green/70 leading-relaxed border-t border-forest/10 pt-3">
+              <p className="text-xs sm:text-sm text-dark-green/70 leading-relaxed border-t border-forest/10 pt-2 sm:pt-3">
                 {description}
               </p>
             )}
             
             {status === "AVAILABLE" && (
-                <div className="mt-4 pt-2 border-t border-forest/5">
-                   <button className="w-full py-3 bg-forest text-cream rounded-xl font-medium shadow-lg hover:shadow-xl hover:bg-forest/90 transition-all transform hover:-translate-y-0.5 cursor-pointer flex items-center justify-center gap-2 text-sm">
+                <div className="mt-3 sm:mt-4 pt-2 border-t border-forest/5">
+                   <button className="w-full py-2.5 sm:py-3 bg-forest text-cream rounded-xl font-medium shadow-lg hover:shadow-xl hover:bg-forest/90 transition-all transform hover:-translate-y-0.5 cursor-pointer flex items-center justify-center gap-2 text-xs sm:text-sm">
                     Consultar Ahora
                   </button>
                 </div>

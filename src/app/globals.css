@@ -40,4 +40,15 @@ body {
   .glass-dark {
     @apply bg-dark-green/80 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)];
   }
+  
+  /* Diagonal & Asymmetric Utilities */
+  .diagonal-top {
+    clip-path: polygon(0 0, 100% 5%, 100% 100%, 0 100%);
+  }
+  .diagonal-bottom {
+    clip-path: polygon(0 0, 100% 0, 100% 95%, 0 100%);
+  }
+  .diagonal-both {
+    clip-path: polygon(0 5%, 100% 0, 100% 95%, 0 100%);
+  }
 }
