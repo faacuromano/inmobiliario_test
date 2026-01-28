@@ -32,8 +32,8 @@ export function LotView({ lot, isEmbed = false }: LotViewProps) {
   // Desktop View OR Embed Mode: Floating/Static Card
   if (!isMobile || isEmbed) {
     return (
-      <div className={isEmbed ? "w-full h-full flex items-center justify-center p-2" : "absolute inset-0 pointer-events-none flex items-center justify-center p-4 z-10"}>
-        <div className={`pointer-events-auto w-full ${isEmbed ? 'max-w-xs' : 'max-w-md'}`}>
+      <div className={isEmbed ? "w-full h-full flex items-center justify-center" : "absolute inset-0 pointer-events-none flex items-center justify-center p-4 z-10"}>
+        <div className={`pointer-events-auto w-full ${isEmbed ? 'h-full' : 'max-w-md'}`}>
           <LotCard
             isEmbed={isEmbed}
             number={lot.number}
