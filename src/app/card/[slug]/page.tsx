@@ -32,14 +32,15 @@ export default async function LotPage({ params, searchParams }: PageProps) {
   const panoeeUrl = process.env.NEXT_PUBLIC_PANOEE_URL; 
 
   return (
-    <main className={`relative w-full h-screen overflow-hidden ${isEmbed ? 'bg-transparent' : ''}`}>
+    <main className={`relative w-full h-screen overflow-hidden ${isEmbed ? 'bg-transparent flex items-center justify-center' : ''}`}>
       {/* 1. Background Layer: Panoee Iframe (Only if NOT embedded) */}
       {!isEmbed && <PanoeeBridge src={panoeeUrl || ""} />}
 
       {/* 2. Overlay Layer: Responsive Lot View */}
-      <div className="relative z-10 w-full h-full pointer-events-none">
+      {/* In Embed mode, removing the absolute positioning wrapper to let flexbox center the content naturally */}
+      <div className={`${isEmbed ? 'w-full h-full max-h-screen p-2' : 'relative z-10 w-full h-full pointer-events-none'}`}>
           {!isEmbed && (
-             <Link href="/" className="absolute top-4 right-4 z-50 p-2 bg-white backdrop-blur text-dark-green pointer-events-auto hover:bg-white/40 transition-colors">
+             <Link href="/" className="absolute top-4 right-4 z-50 p-2 bg-white/20 backdrop-blur rounded-full text-dark-green pointer-events-auto hover:bg-white/40 transition-colors">
                  ✕
              </Link>
           )}
