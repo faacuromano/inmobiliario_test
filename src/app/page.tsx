@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { PanoeeEmbed } from "@/components/tour-embed";
+import { Header } from "@/components/header";
 import { Leaf, MapPin, Trees, ShieldCheck, ArrowDown } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -44,19 +45,7 @@ export default function Home() {
         </div>
 
         {/* Floating Header */}
-        <motion.nav 
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.8 }}
-          className="absolute top-0 left-0 right-0 p-6 md:p-10 flex justify-between items-center z-20"
-        >
-          <div className="text-dark-green font-heading text-xl md:text-2xl font-bold tracking-tight">
-            Raíces<span className="text-forest">.</span>
-          </div>
-          <Link href="/admin" className="text-xs font-semibold uppercase tracking-widest text-dark-green/50 hover:text-dark-green transition-colors">
-            Admin
-          </Link>
-        </motion.nav>
+        <Header />
 
         {/* MAIN EMBED CONTAINER */}
         <div className="relative w-full max-w-[1600px] flex-1 flex flex-col md:flex-row gap-8 items-center justify-center z-10 pt-16">
@@ -97,7 +86,7 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.8 }}
               className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start pt-4"
             >
-              <Link href="/tour" className="px-8 py-4 bg-dark-green text-cream rounded-2xl font-bold text-sm hover:scale-105 active:scale-95 transition-all shadow-xl shadow-forest/20">
+              <Link href="/tour" className="px-8 py-4 bg-dark-green text-cream rounded-2xl font-bold text-sm hover:scale-105 active:scale-95 transition-all shadow-xl shadow-forest/20 hover-ripple hover-organic-lift">
                 Iniciar Recorrido
               </Link>
               <button 
@@ -160,15 +149,16 @@ export default function Home() {
 
       {/* 3. DETAILS GRID (Symmetric) */}
       <section className="py-24 bg-cream relative z-10">
+          <div className="absolute inset-0 bg-grid-pattern opacity-[0.4] pointer-events-none" />
           <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 items-start">
               <motion.div 
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
-                className="group p-8 rounded-t-[3rem] rounded-bl-[3rem] bg-white border border-white/60 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2"
+                className="group p-8 rounded-t-[3rem] rounded-bl-[3rem] bg-white border border-white/60 shadow-lg transition-all hover-organic-lift"
               >
-                  <div className="w-14 h-14 bg-forest/10 rounded-2xl flex items-center justify-center text-forest mb-6 group-hover:scale-110 transition-transform rotate-3 group-hover:rotate-6">
+                  <div className="w-14 h-14 bg-forest/10 rounded-2xl flex items-center justify-center text-forest mb-6 hover-leaf-sway">
                       <MapPin size={28} />
                   </div>
                   <h3 className="text-xl font-heading font-bold text-dark-green mb-3">Ubicación Estratégica</h3>
@@ -180,10 +170,10 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.2 }}
-                className="group p-8 rounded-[3rem] bg-dark-green text-cream shadow-xl hover:shadow-2xl transition-all hover:-translate-y-2 relative z-10"
+                className="group p-8 rounded-[3rem] bg-dark-green text-cream shadow-xl transition-all relative z-10 hover-organic-lift"
               >
                   <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -translate-y-10 translate-x-10 pointer-events-none" />
-                  <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center text-gold mb-6 group-hover:scale-110 transition-transform -rotate-3 group-hover:-rotate-6">
+                  <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center text-gold mb-6 hover-leaf-sway">
                       <Trees size={28} />
                   </div>
                   <h3 className="text-xl font-heading font-bold text-cream mb-3">Espacios Verdes</h3>
@@ -195,9 +185,9 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.4 }}
-                className="group p-8 rounded-t-[3rem] rounded-br-[3rem] bg-white border border-white/60 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2"
+                className="group p-8 rounded-t-[3rem] rounded-br-[3rem] bg-white border border-white/60 shadow-lg transition-all hover-organic-lift"
               >
-                  <div className="w-14 h-14 bg-forest/5 rounded-2xl flex items-center justify-center text-dark-green mb-6 group-hover:scale-110 transition-transform rotate-3 group-hover:rotate-0">
+                  <div className="w-14 h-14 bg-forest/5 rounded-2xl flex items-center justify-center text-dark-green mb-6 hover-leaf-sway">
                       <ShieldCheck size={28} />
                   </div>
                   <h3 className="text-xl font-heading font-bold text-dark-green mb-3">Seguridad Inteligente</h3>
