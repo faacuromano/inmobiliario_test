@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: "/card/:path*",
+        source: "/:path*",
         headers: [
           {
             key: "Content-Security-Policy",
