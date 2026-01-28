@@ -8,6 +8,13 @@ import { motion } from "framer-motion";
 export default function Home() {
   const TOUR_ID = "69791a27ce79982e367d354b"; // Configurable if needed
 
+  const scrollToId = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <main className="min-h-screen bg-cream selection:bg-forest/30 overflow-x-hidden">
       
@@ -85,9 +92,12 @@ export default function Home() {
               <Link href="/tour" className="px-8 py-4 bg-dark-green text-cream rounded-2xl font-bold text-sm hover:scale-105 active:scale-95 transition-all shadow-xl shadow-forest/20">
                 Iniciar Recorrido
               </Link>
-              <a href="#about" className="px-8 py-4 bg-white/40 border border-white/60 text-dark-green rounded-2xl font-bold text-sm hover:bg-white/60 transition-all backdrop-blur-sm cursor-pointer flex items-center justify-center gap-2">
+              <button 
+                onClick={() => scrollToId("about")}
+                className="px-8 py-4 bg-white/40 border border-white/60 text-dark-green rounded-2xl font-bold text-sm hover:bg-white/60 transition-all backdrop-blur-sm cursor-pointer flex items-center justify-center gap-2"
+              >
                 Más Información <ArrowDown size={16} />
-              </a>
+              </button>
             </motion.div>
           </div>
 
