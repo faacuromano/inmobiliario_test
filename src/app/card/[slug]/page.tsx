@@ -36,6 +36,13 @@ export default async function LotPage({ params, searchParams }: PageProps) {
       {/* 1. Background Layer: Panoee Iframe (Only if NOT embedded) */}
       {!isEmbed && <PanoeeBridge src={panoeeUrl || ""} />}
 
+      {/* Force transparent body/html for Embed Mode */}
+      {isEmbed && (
+        <style dangerouslySetInnerHTML={{ __html: `
+          html, body { background: transparent !important; }
+        `}} />
+      )}
+
       {/* 2. Overlay Layer: Responsive Lot View */}
       {/* In Embed mode, removing the absolute positioning wrapper to let flexbox center the content naturally */}
       <div className={`${isEmbed ? 'w-full h-full max-h-screen p-2' : 'relative z-10 w-full h-full pointer-events-none'}`}>
