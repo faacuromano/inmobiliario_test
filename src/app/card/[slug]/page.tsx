@@ -39,7 +39,7 @@ export default async function LotPage({ params, searchParams }: PageProps) {
       {/* 2. Overlay Layer: Responsive Lot View */}
       <div className="relative z-10 w-full h-full pointer-events-none">
           {!isEmbed && (
-             <Link href="/" className="absolute top-4 right-4 z-50 p-2 bg-white/20 backdrop-blur rounded-full text-dark-green pointer-events-auto hover:bg-white/40 transition-colors">
+             <Link href="/" className="absolute top-4 right-4 z-50 p-2 bg-white backdrop-blur text-dark-green pointer-events-auto hover:bg-white/40 transition-colors">
                  ✕
              </Link>
           )}
