@@ -35,6 +35,7 @@ export function LotView({ lot, isEmbed = false }: LotViewProps) {
       <div className={isEmbed ? "w-full h-full flex items-center justify-center p-2" : "absolute inset-0 pointer-events-none flex items-center justify-center p-4 z-10"}>
         <div className={`pointer-events-auto w-full ${isEmbed ? 'max-w-xs' : 'max-w-md'}`}>
           <LotCard
+            isEmbed={isEmbed}
             number={lot.number}
             price={Number(lot.price)}
             currency={lot.currency}
