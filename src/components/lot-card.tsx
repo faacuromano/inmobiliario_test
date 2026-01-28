@@ -18,7 +18,29 @@ interface LotCardProps {
   isEmbed?: boolean;
 }
 
-// ... statusConfig remains the same ...
+const statusConfig = {
+  AVAILABLE: {
+    color: "text-forest",
+    bg: "bg-forest/10",
+    border: "border-forest/20",
+    icon: CheckCircle,
+    label: "Disponible",
+  },
+  RESERVED: {
+    color: "text-gold",
+    bg: "bg-gold/10",
+    border: "border-gold/20",
+    icon: AlertCircle,
+    label: "Reservado",
+  },
+  SOLD: {
+    color: "text-gray-500",
+    bg: "bg-gray-100/50",
+    border: "border-gray-200",
+    icon: Ban,
+    label: "Vendido",
+  },
+};
 
 export function LotCard({
   number,
