@@ -66,7 +66,7 @@ export function LotCard({
       className={clsx(
         "relative overflow-hidden w-full mx-auto",
         isEmbed 
-          ? "h-full flex flex-col bg-white/95 backdrop-blur-2xl sm:rounded-2xl border border-white/20 shadow-2xl" 
+          ? "h-full flex flex-col bg-black/40 backdrop-blur-xl sm:rounded-2xl border border-white/10 shadow-2xl" 
           : "glass rounded-2xl p-6 sm:p-8 max-w-md shadow-2xl border border-white/20"
       )}
     >
@@ -78,25 +78,25 @@ export function LotCard({
       */}
       
       {isEmbed ? (
-        // === EMBED HUD MODE ===
-        // Designed to fill the iframe completely with a sleek dashboard feel.
-         <div className="flex flex-col h-full">
+        // === EMBED HUD MODE (DARK INTEGRATED) ===
+        // Designed to blend seamlessly with Panoee's dark background
+         <div className="flex flex-col h-full text-cream">
             {/* HUD Header */}
-            <div className="flex justify-between items-center px-6 py-4 border-b border-forest/10 bg-forest/5">
+            <div className="flex justify-between items-center px-6 py-4 border-b border-white/5 bg-white/5">
                 <div className="flex items-center gap-3">
-                   <div className="w-10 h-10 rounded-full bg-forest text-cream flex items-center justify-center font-bold text-xl font-heading shadow-md">
+                   <div className="w-10 h-10 rounded-full bg-cream text-forest flex items-center justify-center font-bold text-xl font-heading shadow-md shadow-forest/20">
                       {number}
                    </div>
                    <div className="flex flex-col">
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-forest/60">Lote N°</span>
-                      <span className="text-xs font-medium text-dark-green">{config.label}</span>
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-cream/60">Lote N°</span>
+                      <span className="text-xs font-medium text-cream/90">{config.label}</span>
                    </div>
                 </div>
                 {/* Price Pill */}
                  {status === "AVAILABLE" && (
                     <div className="text-right">
-                       <span className="block text-[10px] font-bold uppercase tracking-widest text-forest/60">Valor</span>
-                       <span className="text-xl font-bold font-heading text-forest">{currency} {price.toLocaleString()}</span>
+                       <span className="block text-[10px] font-bold uppercase tracking-widest text-cream/60">Valor</span>
+                       <span className="text-xl font-bold font-heading text-cream">{currency} {price.toLocaleString()}</span>
                     </div>
                  )}
             </div>
@@ -106,30 +106,30 @@ export function LotCard({
                  {/* Left: Stats (Clean Typography, No Boxes) */}
                  <div className="flex flex-col justify-center space-y-6">
                     <div>
-                        <div className="flex items-center gap-2 text-forest/60 mb-1">
+                        <div className="flex items-center gap-2 text-cream/50 mb-1">
                             <Ruler size={16} />
                             <span className="text-xs font-bold uppercase tracking-wider">Dimensiones</span>
                         </div>
-                        <div className="text-2xl font-light text-dark-green">{dimensions}</div>
+                        <div className="text-3xl font-light text-cream">{dimensions}</div>
                     </div>
                     <div>
-                         <div className="flex items-center gap-2 text-forest/60 mb-1">
+                         <div className="flex items-center gap-2 text-cream/50 mb-1">
                             <Maximize size={16} />
                             <span className="text-xs font-bold uppercase tracking-wider">Superficie Total</span>
                         </div>
-                        <div className="text-2xl font-light text-dark-green">{area} <span className="text-sm font-bold">m²</span></div>
+                        <div className="text-3xl font-light text-cream">{area} <span className="text-sm font-bold text-cream/60">m²</span></div>
                     </div>
                  </div>
 
                  {/* Right: Description & CTA */}
-                 <div className="flex flex-col justify-center h-full border-l border-forest/10 pl-6 space-y-4">
+                 <div className="flex flex-col justify-center h-full border-l border-white/10 pl-6 space-y-4">
                      {description && (
-                        <p className="text-sm text-dark-green/80 leading-relaxed line-clamp-4">
+                        <p className="text-sm text-cream/80 leading-relaxed line-clamp-4 font-light">
                           {description}
                         </p>
                       )}
                       {status === "AVAILABLE" && (
-                        <button className="w-full py-3 bg-forest text-cream rounded-lg font-bold shadow-lg hover:shadow-xl hover:bg-forest/90 transition-all transform hover:-translate-y-0.5 cursor-pointer text-sm tracking-wide mt-auto">
+                        <button className="w-full py-3 bg-cream text-forest rounded-lg font-bold shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:bg-white transition-all transform hover:-translate-y-0.5 cursor-pointer text-sm tracking-wide mt-auto">
                            Consultar Ahora
                         </button>
                       )}
@@ -137,7 +137,7 @@ export function LotCard({
             </div>
          </div>
       ) : (
-        // === STANDARD CARD MODE ===
+        // === STANDARD CARD MODE (LIGHT/GLASS) ===
         <div className="space-y-6">
            {/* Header */}
           <div className="flex justify-between items-start">
