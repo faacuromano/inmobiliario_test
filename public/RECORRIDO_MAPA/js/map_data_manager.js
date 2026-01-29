@@ -16,8 +16,6 @@ class MapDataManager {
     // Format: "wrong-slug-from-panoee": "correct-slug-in-db"
     this.urlOverrides = {
       // Example: "lote-error": "lote-1",
-      "hotspot-697922b6ce799886127d363e-krpanoviewsnapshot-typelink-ispolygon":
-        "lote-5", // A5 Mapping
     };
   }
 
@@ -184,30 +182,16 @@ class MapDataManager {
       if (targetSlug) {
         const lotInfo = this.lotsData.find((l) => l.slug === targetSlug);
         if (lotInfo) {
-          let preferNativeClick = true; // Default to true
-
           // Construct URL if missing (e.g. forced by name override)
           if (!targetUrl) {
             targetUrl = `${window.location.origin}/card/${targetSlug}?embed=true`;
-            preferNativeClick = false; // We generated the URL, so use it!
           }
           // Ensure embed param
           if (!targetUrl.includes("embed=true")) {
             targetUrl += (targetUrl.includes("?") ? "&" : "?") + "embed=true";
           }
 
-          // If we used an override, we likely don't trust the native click (which might be broken)
-          if (this.urlOverrides[kName] || this.urlOverrides[targetSlug]) {
-            preferNativeClick = false;
-          }
-
-          this.createShadowHotspot(
-            krpano,
-            kName,
-            lotInfo.status,
-            targetUrl,
-            preferNativeClick,
-          );
+          this.createShadowHotspot(krpano, kName, lotInfo.status, targetUrl);
         } else {
           console.warn(
             `[MapDataManager] Slug "${targetSlug}" not found in DB.`,
@@ -268,13 +252,7 @@ class MapDataManager {
     });
   }
 
-  createShadowHotspot(
-    krpano,
-    originalName,
-    status,
-    clickUrl,
-    preferNativeClick = true,
-  ) {
+  createShadowHotspot(krpano, originalName, status, clickUrl) {
     const shadowName = "shadow_" + originalName;
     const isNew = !krpano.get(`hotspot[${shadowName}].name`);
 
@@ -332,7 +310,6 @@ class MapDataManager {
 
     // 5. Update Interaction
     if (
-      preferNativeClick &&
       originalOnClick &&
       originalOnClick !== "" &&
       originalOnClick !== "null"
