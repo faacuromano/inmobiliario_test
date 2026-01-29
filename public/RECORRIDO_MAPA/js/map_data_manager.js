@@ -11,6 +11,14 @@ class MapDataManager {
     this.maxRetries = 60;
     this.lotsData = null;
     this.krpano = null;
+
+    // MAPPING CORRECTIONS
+    // Format: "wrong-slug-from-panoee": "correct-slug-in-db"
+    this.urlOverrides = {
+      // Example: "lote-error": "lote-1",
+      "hotspot-697922b6ce799886127d363e-krpanoviewsnapshot-typelink-ispolygon":
+        "lote-5", // A5 Mapping
+    };
   }
 
   init() {
@@ -112,52 +120,102 @@ class MapDataManager {
 
     for (let i = 0; i < krpanoHotspotCount; i++) {
       const kName = krpano.get(`hotspot[${i}].name`);
-      const matchingReactHotspot = reactHotspots.find((rh) =>
-        kName.includes(rh.id),
-      );
+      let targetSlug = null;
+      let targetUrl = null;
 
-      if (matchingReactHotspot) {
-        let hotspotUrl =
-          (matchingReactHotspot.config &&
-            matchingReactHotspot.config.link &&
-            matchingReactHotspot.config.link.url) ||
-          (matchingReactHotspot.link && matchingReactHotspot.link.url) ||
-          null;
+      // 1. CHECK NAME OVERRIDE (Direct mapping from Hotspot ID)
+      if (this.urlOverrides[kName]) {
+        targetSlug = this.urlOverrides[kName];
+        console.log(
+          `[MapDataManager] ⚠️ Override by Name: "${kName}" -> "${targetSlug}"`,
+        );
+      }
 
-        // Rewrite localhost logic
-        const isLocal =
-          window.location.hostname === "localhost" ||
-          window.location.hostname === "127.0.0.1";
-        if (hotspotUrl && isLocal) {
-          const prodDomain = "inmobiliario-test.vercel.app";
-          if (hotspotUrl.includes(prodDomain)) {
-            hotspotUrl = hotspotUrl
-              .replace(`https://${prodDomain}`, window.location.origin)
-              .replace(`http://${prodDomain}`, window.location.origin);
+      // 2. CHECK URL/REACT MAPPING (If no name override)
+      if (!targetSlug) {
+        const matchingReactHotspot = reactHotspots.find((rh) =>
+          kName.includes(rh.id),
+        );
+        if (matchingReactHotspot) {
+          let hotspotUrl =
+            (matchingReactHotspot.config &&
+              matchingReactHotspot.config.link &&
+              matchingReactHotspot.config.link.url) ||
+            (matchingReactHotspot.link && matchingReactHotspot.link.url) ||
+            null;
+
+          // Rewrite localhost
+          const isLocal =
+            window.location.hostname === "localhost" ||
+            window.location.hostname === "127.0.0.1";
+          if (hotspotUrl && isLocal) {
+            const prodDomain = "inmobiliario-test.vercel.app";
+            if (hotspotUrl.includes(prodDomain)) {
+              hotspotUrl = hotspotUrl
+                .replace(`https://${prodDomain}`, window.location.origin)
+                .replace(`http://${prodDomain}`, window.location.origin);
+            }
           }
-        }
 
-        if (
-          hotspotUrl &&
-          typeof hotspotUrl === "string" &&
-          hotspotUrl.includes("/card/")
-        ) {
-          const slugMatch = hotspotUrl.match(/\/card\/([^\?]+)/);
-          if (slugMatch && slugMatch[1]) {
-            const slug = slugMatch[1];
-            const lotInfo = this.lotsData.find((l) => l.slug === slug);
-
-            if (lotInfo) {
-              // Create Shadow Hotspot Implementation
-              this.createShadowHotspot(
-                krpano,
-                kName,
-                lotInfo.status,
-                hotspotUrl,
-              );
+          if (
+            hotspotUrl &&
+            typeof hotspotUrl === "string" &&
+            hotspotUrl.includes("/card/")
+          ) {
+            const slugMatch = hotspotUrl.match(/\/card\/([^\?]+)/);
+            if (slugMatch && slugMatch[1]) {
+              let rawSlug = slugMatch[1];
+              // Apply Slug Override
+              if (this.urlOverrides[rawSlug]) {
+                console.log(
+                  `[MapDataManager] ⚠️ Override by Slug: "${rawSlug}" -> "${this.urlOverrides[rawSlug]}"`,
+                );
+                targetSlug = this.urlOverrides[rawSlug];
+              } else {
+                targetSlug = rawSlug;
+              }
+              targetUrl = hotspotUrl;
             }
           }
         }
+      }
+
+      // 3. GENERATE SHADOW IF SLUG FOUND
+      if (targetSlug) {
+        const lotInfo = this.lotsData.find((l) => l.slug === targetSlug);
+        if (lotInfo) {
+          let preferNativeClick = true; // Default to true
+
+          // Construct URL if missing (e.g. forced by name override)
+          if (!targetUrl) {
+            targetUrl = `${window.location.origin}/card/${targetSlug}?embed=true`;
+            preferNativeClick = false; // We generated the URL, so use it!
+          }
+          // Ensure embed param
+          if (!targetUrl.includes("embed=true")) {
+            targetUrl += (targetUrl.includes("?") ? "&" : "?") + "embed=true";
+          }
+
+          // If we used an override, we likely don't trust the native click (which might be broken)
+          if (this.urlOverrides[kName] || this.urlOverrides[targetSlug]) {
+            preferNativeClick = false;
+          }
+
+          this.createShadowHotspot(
+            krpano,
+            kName,
+            lotInfo.status,
+            targetUrl,
+            preferNativeClick,
+          );
+        } else {
+          console.warn(
+            `[MapDataManager] Slug "${targetSlug}" not found in DB.`,
+          );
+        }
+      } else {
+        // Log unmapped hotspots to help user find IDs
+        // console.log(`[MapDataManager] Unmapped Hotspot: ${kName}`);
       }
     }
     krpano.call("updatescreen();");
@@ -210,7 +268,13 @@ class MapDataManager {
     });
   }
 
-  createShadowHotspot(krpano, originalName, status, clickUrl) {
+  createShadowHotspot(
+    krpano,
+    originalName,
+    status,
+    clickUrl,
+    preferNativeClick = true,
+  ) {
     const shadowName = "shadow_" + originalName;
     const isNew = !krpano.get(`hotspot[${shadowName}].name`);
 
@@ -268,6 +332,7 @@ class MapDataManager {
 
     // 5. Update Interaction
     if (
+      preferNativeClick &&
       originalOnClick &&
       originalOnClick !== "" &&
       originalOnClick !== "null"
