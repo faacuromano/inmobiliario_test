@@ -17,6 +17,12 @@ export default async function AdminPage() {
     orderBy: { number: "asc" },
   });
 
-  return <AdminDashboard lots={lots} />;
+  // Serialize Decimal objects to plain objects/numbers for Client Component
+  const serializedLots = lots.map(lot => ({
+    ...lot,
+    price: lot.price.toNumber(), // or .toString() depending on component need
+  }));
+
+  return <AdminDashboard lots={serializedLots} />;
 }
 

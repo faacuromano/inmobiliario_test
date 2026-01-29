@@ -11,7 +11,8 @@ export function PanoeeBridge({ src }: PanoeeBridgeProps) {
   const [isLoading, setIsLoading] = useState(true);
 
   // Use the env var or fallback
-  const PANOEE_URL = process.env.NEXT_PUBLIC_PANOEE_URL || "https://panoee.com/recorrido-demo";
+  // Use local self-hosted tour by default
+  const PANOEE_URL = "/RECORRIDO_MAPA/index.html";
   const finalSrc = src || PANOEE_URL;
 
   return (

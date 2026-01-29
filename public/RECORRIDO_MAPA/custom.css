@@ -1,0 +1,32 @@
+/* Custom Overrides for Panoee Tour */
+/* -------------------------------- */
+
+body {
+    margin: 0;
+    overflow: hidden; /* Prevent double scrollbars in iframe */
+    background-color: #ffffff !important;
+}
+
+/* Remove gradient from Header Wrapper */
+/* Trying multiple selectors to ensure it hits the target across builds */
+div[class*="styled__HeaderWrapper"],
+div[class*="header-wrapper"],
+.gGtTIY {
+    background-image: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+}
+
+/* Ensure no other top shadows persist */
+div[class*="topInfo"] {
+    background-image: none !important;
+}
+
+/* Force white background on all main containers */
+#__next,
+.blaHUf,
+div[class*="styled__HomeWrapper"],
+#krpanoSWFObject,
+canvas {
+    background-color: #ffffff !important;
+}

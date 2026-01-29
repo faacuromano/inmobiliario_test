@@ -1,14 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { PanoeeEmbed } from "@/components/tour-embed";
+import VirtualTour from "@/components/VirtualTour";
 import { Header } from "@/components/header";
 import { Leaf, MapPin, Trees, ShieldCheck, ArrowDown } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function Home() {
-  const TOUR_ID = "69791a27ce79982e367d354b"; // Configurable if needed
-
+  
   const scrollToId = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
@@ -106,7 +105,7 @@ export default function Home() {
             className="flex-[1.5] w-full aspect-[4/3] md:h-[70vh] relative"
           >
              <div className="w-full h-full rounded-[2rem] md:rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white/50 relative group transform transition-transform hover:scale-[1.01] duration-700">
-                <PanoeeEmbed tourId={TOUR_ID} />
+                <VirtualTour />
                 
                 {/* Interactive Hint */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-100 group-hover:opacity-0 transition-opacity duration-700 ease-in-out">
