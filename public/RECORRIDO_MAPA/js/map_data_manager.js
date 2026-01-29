@@ -214,6 +214,10 @@ class MapDataManager {
     const shadowName = "shadow_" + originalName;
     const isNew = !krpano.get(`hotspot[${shadowName}].name`);
 
+    // 0. Capture Native Interaction
+    let originalOnClick = krpano.get(`hotspot[${originalName}].onclick`);
+    if (originalOnClick === "null") originalOnClick = null;
+
     // 1. Hide Origin Panoee Hotspot (Always ensure this)
     krpano.set(`hotspot[${originalName}].visible`, false);
     krpano.set(`hotspot[${originalName}].enabled`, false);
@@ -263,13 +267,21 @@ class MapDataManager {
     krpano.set(`hotspot[${shadowName}].onout`, onOutCmd);
 
     // 5. Update Interaction
-    krpano.set(
-      `hotspot[${shadowName}].onclick`,
-      `openurl('${clickUrl}', _blank);`,
-    );
+    if (
+      originalOnClick &&
+      originalOnClick !== "" &&
+      originalOnClick !== "null"
+    ) {
+      krpano.set(`hotspot[${shadowName}].onclick`, originalOnClick);
+    } else {
+      krpano.set(
+        `hotspot[${shadowName}].onclick`,
+        `openurl('${clickUrl}', _self);`,
+      );
+    }
 
     console.log(
-      `[MapDataManager] Shadow ${shadowName}: Status="${status}" -> Forced Color=${colorHex}`,
+      `[MapDataManager] Shadow ${shadowName}: Status="${status}" -> Forced Color=${colorHex} | ClickFallback=${!originalOnClick}`,
     );
   }
 }
