@@ -1,21 +1,23 @@
 import type { Metadata } from "next";
-import { Outfit, Manrope } from "next/font/google";
+import { Cormorant_Garamond, Space_Mono } from "next/font/google";
 import "./globals.css";
 
-const outfit = Outfit({
-  variable: "--font-outfit",
+const cormorant = Cormorant_Garamond({
+  variable: "--font-cormorant",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
   display: "swap",
 });
 
-const manrope = Manrope({
-  variable: "--font-manrope",
+const spaceMono = Space_Mono({
+  variable: "--font-space",
   subsets: ["latin"],
+  weight: ["400", "700"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Loteo Raíces de Alvear",
+  title: "Raíces de Alvear — Barrio Residencial",
   description: "Tu futuro empieza aquí. Barrio semi-cerrado con naturaleza y seguridad.",
 };
 
@@ -27,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body
-        className={`${outfit.variable} ${manrope.variable} antialiased`}
+        className={`${cormorant.variable} ${spaceMono.variable} antialiased`}
       >
         {children}
       </body>

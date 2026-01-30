@@ -1,27 +1,35 @@
 @import "tailwindcss";
 
 @theme {
-  --color-forest: #4a6741;
-  --color-gold: #c5a880;
-  --color-cream: #f9f9f7;
-  --color-dark-green: #1c2818;
+  /* TERRA NATURA — Warm Forest & Earth */
+  --color-linen: #f5f0e6;
+  --color-wheat: #ede6d8;
+  --color-sage-light: #e2e8d8;
+  --color-sage: #c8d4b8;
+  --color-moss: #7a8b6a;
+  --color-fern: #5a6e4c;
+  --color-forest: #3a4d32;
+  --color-deep: #1c2b1a;
+  --color-bark: #4a3728;
+  --color-terra: #c17c4e;
+  --color-clay: #a0694a;
+  --color-walnut: #2e2418;
 
-  --font-heading: var(--font-outfit);
-  --font-body: var(--font-manrope);
+  /* Legacy aliases */
+  --color-gold: #c17c4e;
+  --color-cream: #f5f0e6;
+  --color-dark-green: #1c2b1a;
+  --color-ivory: #f5f0e6;
+  --color-amber: #c17c4e;
+
+  --font-heading: var(--font-cormorant);
+  --font-body: var(--font-cormorant);
+  --font-mono: var(--font-space);
 }
 
 :root {
-  /* Default Theme (Light/Organic) */
-  --background: var(--color-cream);
-  --foreground: var(--color-dark-green);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Night Forest Theme */
-    --background: var(--color-dark-green);
-    --foreground: var(--color-cream);
-  }
+  --background: var(--color-linen);
+  --foreground: var(--color-deep);
 }
 
 html {
@@ -36,48 +44,175 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Glassmorphism Utilities */
+/* ═══════════════════════════════════════════
+   GLASS
+   ═══════════════════════════════════════════ */
 @layer utilities {
   .glass {
-    @apply bg-cream/80 backdrop-blur-xl border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)];
+    @apply bg-linen/80 backdrop-blur-2xl border border-forest/8 shadow-[0_4px_40px_0_rgba(28,43,26,0.06)];
   }
   .glass-dark {
-    @apply bg-dark-green/80 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)];
-  }
-  
-  /* Diagonal & Asymmetric Utilities */
-  .diagonal-top {
-    clip-path: polygon(0 0, 100% 5%, 100% 100%, 0 100%);
-  }
-  .diagonal-bottom {
-    clip-path: polygon(0 0, 100% 0, 100% 95%, 0 100%);
-  }
-  .diagonal-both {
-    clip-path: polygon(0 5%, 100% 0, 100% 95%, 0 100%);
+    @apply bg-deep/80 backdrop-blur-2xl border border-linen/10 shadow-[0_4px_40px_0_rgba(0,0,0,0.3)];
   }
 }
 
-/* Texture Pattern Utilities */
+/* ═══════════════════════════════════════════
+   KEYFRAMES
+   ═══════════════════════════════════════════ */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes counter-warmglow {
+  0%, 100% { text-shadow: 0 0 0 transparent; }
+  50% { text-shadow: 0 0 50px rgba(193, 124, 78, 0.15); }
+}
+
+@keyframes firefly {
+  0%, 100% { opacity: 0; transform: translateY(0) scale(0.5); }
+  20% { opacity: 1; transform: translateY(-10px) scale(1); }
+  80% { opacity: 0.8; transform: translateY(-40px) scale(0.8); }
+}
+
+@keyframes sway {
+  0%, 100% { transform: rotate(-1deg); }
+  50% { transform: rotate(1deg); }
+}
+
+@keyframes float-3d {
+  0%, 100% { transform: translateY(0px) rotateX(0deg) rotateY(0deg); }
+  25% { transform: translateY(-8px) rotateX(2deg) rotateY(-1deg); }
+  50% { transform: translateY(-4px) rotateX(0deg) rotateY(2deg); }
+  75% { transform: translateY(-10px) rotateX(-2deg) rotateY(0deg); }
+}
+
+@keyframes depth-pulse {
+  0%, 100% { transform: translateZ(0px) scale(1); opacity: 0.6; }
+  50% { transform: translateZ(20px) scale(1.02); opacity: 1; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes reveal-up {
+  from { transform: translateY(40px) rotateX(8deg); opacity: 0; }
+  to { transform: translateY(0) rotateX(0deg); opacity: 1; }
+}
+
+@keyframes hero-vignette-pulse {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 0.92; }
+}
+
 @layer utilities {
-  .bg-grid-pattern {
-    background-image: linear-gradient(to right, rgba(28, 40, 24, 0.12) 1px, transparent 1px),
-                      linear-gradient(to bottom, rgba(28, 40, 24, 0.12) 1px, transparent 1px);
-    background-size: 40px 40px;
+  .animate-marquee {
+    animation: marquee 35s linear infinite;
   }
-  
-  .bg-noise {
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+  .animate-counter-warmglow {
+    animation: counter-warmglow 5s ease-in-out infinite;
+  }
+  .animate-firefly {
+    animation: firefly 4s ease-in-out infinite;
+  }
+  .animate-sway {
+    animation: sway 8s ease-in-out infinite;
+  }
+  .animate-float-3d {
+    animation: float-3d 8s ease-in-out infinite;
+  }
+  .animate-depth-pulse {
+    animation: depth-pulse 6s ease-in-out infinite;
+  }
+  .animate-shimmer {
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+  }
+  .animate-reveal-up {
+    animation: reveal-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   3D & PERSPECTIVE
+   ═══════════════════════════════════════════ */
+@layer utilities {
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+  .perspective-1500 {
+    perspective: 1500px;
+  }
+  .perspective-2000 {
+    perspective: 2000px;
+  }
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   TEXTURES
+   ═══════════════════════════════════════════ */
+@layer utilities {
+  .bg-grain {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
   }
 
-  /* Nature Hover Effects */
+  .bg-grid-pattern {
+    background-image: linear-gradient(to right, rgba(58, 77, 50, 0.06) 1px, transparent 1px),
+                      linear-gradient(to bottom, rgba(58, 77, 50, 0.06) 1px, transparent 1px);
+    background-size: 80px 80px;
+  }
+
+  .bg-noise {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  }
+
+  .bg-topo {
+    background-image:
+      url("data:image/svg+xml,%3Csvg width='600' height='600' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cstyle%3E.t%7Bfill:none;stroke:%233a4d32;stroke-width:0.5;opacity:0.06%7D%3C/style%3E%3C/defs%3E%3Cellipse class='t' cx='300' cy='300' rx='280' ry='260'/%3E%3Cellipse class='t' cx='300' cy='300' rx='240' ry='220'/%3E%3Cellipse class='t' cx='300' cy='300' rx='200' ry='180'/%3E%3Cellipse class='t' cx='300' cy='300' rx='160' ry='145'/%3E%3Cellipse class='t' cx='300' cy='300' rx='120' ry='110'/%3E%3Cellipse class='t' cx='300' cy='300' rx='80' ry='75'/%3E%3C/svg%3E");
+    background-size: 600px 600px;
+  }
+
+  .bg-dot-field {
+    background-image: radial-gradient(circle, rgba(58, 77, 50, 0.08) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   DIAGONAL CUTS (preserved for other pages)
+   ═══════════════════════════════════════════ */
+@layer utilities {
+  .diagonal-top {
+    clip-path: polygon(0 0, 100% 4%, 100% 100%, 0 100%);
+  }
+  .diagonal-bottom {
+    clip-path: polygon(0 0, 100% 0, 100% 96%, 0 100%);
+  }
+  .diagonal-both {
+    clip-path: polygon(0 4%, 100% 0, 100% 96%, 0 100%);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   MICRO-INTERACTIONS
+   ═══════════════════════════════════════════ */
+@layer utilities {
   .hover-organic-lift {
-    @apply transition-all duration-500 ease-out;
+    @apply transition-all duration-700 ease-out;
   }
   .hover-organic-lift:hover {
-    box-shadow: 
-      0 20px 40px -5px rgba(28, 40, 24, 0.15),
-      0 10px 20px -5px rgba(28, 40, 24, 0.1);
-    transform: translateY(-4px) scale(1.005);
+    box-shadow:
+      0 24px 48px -8px rgba(28, 43, 26, 0.12),
+      0 8px 16px -4px rgba(28, 43, 26, 0.06);
+    transform: translateY(-6px);
   }
 
   .hover-leaf-sway {
@@ -99,7 +234,7 @@ body {
     left: 50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(193, 124, 78, 0.1) 0%, transparent 70%);
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.5);
     transition: transform 0.6s ease-out, opacity 0.6s ease-out;
@@ -108,4 +243,55 @@ body {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
   }
+
+  /* 3D card tilt on hover */
+  .hover-3d-tilt {
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-style: preserve-3d;
+  }
+  .hover-3d-tilt:hover {
+    transform: perspective(800px) rotateX(4deg) rotateY(-2deg) translateZ(10px);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   SELECTION & SCROLLBAR
+   ═══════════════════════════════════════════ */
+::selection {
+  background: rgba(58, 77, 50, 0.15);
+  color: var(--color-deep);
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-wheat);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-moss);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-forest);
+}
+
+/* ═══════════════════════════════════════════
+   MARQUEE BAND
+   ═══════════════════════════════════════════ */
+.marquee-band {
+  overflow: hidden;
+  white-space: nowrap;
+  border-top: 1px solid rgba(58, 77, 50, 0.1);
+  border-bottom: 1px solid rgba(58, 77, 50, 0.1);
+}
+
+/* ═══════════════════════════════════════════
+   HERO OVERLAY — strong enough for text
+   ═══════════════════════════════════════════ */
+.hero-overlay {
+  background:
+    linear-gradient(to top, rgba(28, 43, 26, 0.95) 0%, rgba(28, 43, 26, 0.6) 40%, rgba(28, 43, 26, 0.35) 70%, rgba(28, 43, 26, 0.5) 100%),
+    linear-gradient(to right, rgba(28, 43, 26, 0.4) 0%, transparent 50%, transparent 100%);
+  animation: hero-vignette-pulse 10s ease-in-out infinite;
 }

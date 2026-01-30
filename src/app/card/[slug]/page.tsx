@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { LotCard, LotStatus } from "@/components/lot-card";
 import { LotView } from "@/components/lot-view";
 import { PanoeeBridge } from "@/components/panoee-bridge";
+import { EmbedBackButton } from "@/components/embed-back-button";
 import Link from "next/link";
 
 // Force dynamic rendering as price/status might change frequently
@@ -46,7 +47,9 @@ export default async function LotPage({ params, searchParams }: PageProps) {
       {/* 2. Overlay Layer: Responsive Lot View */}
       {/* In Embed mode, removing the absolute positioning wrapper to let flexbox center the content naturally */}
       <div className={`${isEmbed ? 'w-full h-full max-h-screen p-2' : 'relative z-10 w-full h-full pointer-events-none'}`}>
-          {!isEmbed && (
+          {isEmbed ? (
+             <EmbedBackButton />
+          ) : (
              <Link href="/" className="absolute top-4 right-4 z-50 p-2 bg-white/20 backdrop-blur rounded-full text-dark-green pointer-events-auto hover:bg-white/40 transition-colors">
                  ✕
              </Link>

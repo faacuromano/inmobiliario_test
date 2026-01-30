@@ -8,10 +8,13 @@ export async function GET() {
     const lots = await prisma.lot.findMany({
       select: {
         slug: true,
+        number: true,
         status: true,
         price: true,
         currency: true,
-        // Add other fields if needed for the map tooltip/interaction
+        dimensions: true,
+        area: true,
+        description: true,
       },
     });
 

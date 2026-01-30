@@ -10,13 +10,9 @@ class MapDataManager {
     this.retryInterval = 2000;
     this.maxRetries = 60;
     this.lotsData = null;
+    this.lotsHash = null;
     this.krpano = null;
-
-    // MAPPING CORRECTIONS
-    // Format: "wrong-slug-from-panoee": "correct-slug-in-db"
-    this.urlOverrides = {
-      // Example: "lote-error": "lote-1",
-    };
+    this.syncInterval = 60000; // 60s — matches ISR cache duration
   }
 
   init() {
@@ -31,6 +27,7 @@ class MapDataManager {
         throw new Error(`HTTP error! status: ${response.status}`);
 
       this.lotsData = await response.json();
+      this.lotsHash = this.computeHash(this.lotsData);
       console.log(
         "[MapDataManager] Data fetched:",
         this.lotsData.length,
@@ -53,6 +50,7 @@ class MapDataManager {
           console.log(`[MapDataManager] Connected to Krpano (${autoId}).`);
           this.krpano = kObj;
           this.updateMap(kObj);
+          this.startPeriodicSync();
           return;
         }
       }
@@ -69,6 +67,7 @@ class MapDataManager {
         console.log("[MapDataManager] Krpano found via standard checks.");
         this.krpano = krpano;
         this.updateMap(krpano);
+        this.startPeriodicSync();
       } else {
         attempts++;
         if (attempts > this.maxRetries) {
@@ -116,90 +115,59 @@ class MapDataManager {
     // We define our styles globally once (idempotent)
     this.defineStyles(krpano);
 
+    // Snapshot hotspot names to avoid index-shifting during iteration
+    const hotspotNames = [];
     for (let i = 0; i < krpanoHotspotCount; i++) {
-      const kName = krpano.get(`hotspot[${i}].name`);
-      let targetSlug = null;
-      let targetUrl = null;
+      const name = krpano.get(`hotspot[${i}].name`);
+      if (name) hotspotNames.push(name);
+    }
 
-      // 1. CHECK NAME OVERRIDE (Direct mapping from Hotspot ID)
-      if (this.urlOverrides[kName]) {
-        targetSlug = this.urlOverrides[kName];
-        console.log(
-          `[MapDataManager] ⚠️ Override by Name: "${kName}" -> "${targetSlug}"`,
-        );
-      }
+    for (const kName of hotspotNames) {
+      const matchingReactHotspot = reactHotspots.find((rh) =>
+        kName.includes(rh.id),
+      );
 
-      // 2. CHECK URL/REACT MAPPING (If no name override)
-      if (!targetSlug) {
-        const matchingReactHotspot = reactHotspots.find((rh) =>
-          kName.includes(rh.id),
-        );
-        if (matchingReactHotspot) {
-          let hotspotUrl =
-            (matchingReactHotspot.config &&
-              matchingReactHotspot.config.link &&
-              matchingReactHotspot.config.link.url) ||
-            (matchingReactHotspot.link && matchingReactHotspot.link.url) ||
-            null;
+      if (matchingReactHotspot) {
+        let hotspotUrl =
+          (matchingReactHotspot.config &&
+            matchingReactHotspot.config.link &&
+            matchingReactHotspot.config.link.url) ||
+          (matchingReactHotspot.link && matchingReactHotspot.link.url) ||
+          null;
 
-          // Rewrite localhost
-          const isLocal =
-            window.location.hostname === "localhost" ||
-            window.location.hostname === "127.0.0.1";
-          if (hotspotUrl && isLocal) {
-            const prodDomain = "inmobiliario-test.vercel.app";
-            if (hotspotUrl.includes(prodDomain)) {
-              hotspotUrl = hotspotUrl
-                .replace(`https://${prodDomain}`, window.location.origin)
-                .replace(`http://${prodDomain}`, window.location.origin);
-            }
+        // Rewrite localhost logic
+        const isLocal =
+          window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1";
+        if (hotspotUrl && isLocal) {
+          const prodDomain = "inmobiliario-test.vercel.app";
+          if (hotspotUrl.includes(prodDomain)) {
+            hotspotUrl = hotspotUrl
+              .replace(`https://${prodDomain}`, window.location.origin)
+              .replace(`http://${prodDomain}`, window.location.origin);
           }
+        }
 
-          if (
-            hotspotUrl &&
-            typeof hotspotUrl === "string" &&
-            hotspotUrl.includes("/card/")
-          ) {
-            const slugMatch = hotspotUrl.match(/\/card\/([^\?]+)/);
-            if (slugMatch && slugMatch[1]) {
-              let rawSlug = slugMatch[1];
-              // Apply Slug Override
-              if (this.urlOverrides[rawSlug]) {
-                console.log(
-                  `[MapDataManager] ⚠️ Override by Slug: "${rawSlug}" -> "${this.urlOverrides[rawSlug]}"`,
-                );
-                targetSlug = this.urlOverrides[rawSlug];
-              } else {
-                targetSlug = rawSlug;
-              }
-              targetUrl = hotspotUrl;
+        if (
+          hotspotUrl &&
+          typeof hotspotUrl === "string" &&
+          hotspotUrl.includes("/card/")
+        ) {
+          const slugMatch = hotspotUrl.match(/\/card\/([^\?]+)/);
+          if (slugMatch && slugMatch[1]) {
+            const slug = slugMatch[1];
+            const lotInfo = this.lotsData.find((l) => l.slug === slug);
+
+            if (lotInfo) {
+              // Create Shadow Hotspot Implementation
+              this.createShadowHotspot(
+                krpano,
+                kName,
+                lotInfo,
+              );
             }
           }
         }
-      }
-
-      // 3. GENERATE SHADOW IF SLUG FOUND
-      if (targetSlug) {
-        const lotInfo = this.lotsData.find((l) => l.slug === targetSlug);
-        if (lotInfo) {
-          // Construct URL if missing (e.g. forced by name override)
-          if (!targetUrl) {
-            targetUrl = `${window.location.origin}/card/${targetSlug}?embed=true`;
-          }
-          // Ensure embed param
-          if (!targetUrl.includes("embed=true")) {
-            targetUrl += (targetUrl.includes("?") ? "&" : "?") + "embed=true";
-          }
-
-          this.createShadowHotspot(krpano, kName, lotInfo.status, targetUrl);
-        } else {
-          console.warn(
-            `[MapDataManager] Slug "${targetSlug}" not found in DB.`,
-          );
-        }
-      } else {
-        // Log unmapped hotspots to help user find IDs
-        // console.log(`[MapDataManager] Unmapped Hotspot: ${kName}`);
       }
     }
     krpano.call("updatescreen();");
@@ -252,13 +220,10 @@ class MapDataManager {
     });
   }
 
-  createShadowHotspot(krpano, originalName, status, clickUrl) {
+  createShadowHotspot(krpano, originalName, lotInfo) {
     const shadowName = "shadow_" + originalName;
     const isNew = !krpano.get(`hotspot[${shadowName}].name`);
-
-    // 0. Capture Native Interaction
-    let originalOnClick = krpano.get(`hotspot[${originalName}].onclick`);
-    if (originalOnClick === "null") originalOnClick = null;
+    const status = lotInfo.status;
 
     // 1. Hide Origin Panoee Hotspot (Always ensure this)
     krpano.set(`hotspot[${originalName}].visible`, false);
@@ -302,34 +267,124 @@ class MapDataManager {
     krpano.set(`hotspot[${shadowName}].fillcolor`, colorHex);
     krpano.set(`hotspot[${shadowName}].fillalpha`, config.alpha);
     krpano.set(`hotspot[${shadowName}].borderwidth`, 3);
+    krpano.set(`hotspot[${shadowName}].borderalpha`, 0.0);
 
     const onOverCmd = `set(fillalpha, ${config.hoverAlpha}); set(fillcolor, ${colorHex});`;
     const onOutCmd = `set(fillalpha, ${config.alpha}); set(fillcolor, ${colorHex});`;
     krpano.set(`hotspot[${shadowName}].onover`, onOverCmd);
     krpano.set(`hotspot[${shadowName}].onout`, onOutCmd);
 
-    // 5. Update Interaction
-    if (
-      originalOnClick &&
-      originalOnClick !== "" &&
-      originalOnClick !== "null"
-    ) {
-      krpano.set(`hotspot[${shadowName}].onclick`, originalOnClick);
-    } else {
-      krpano.set(
-        `hotspot[${shadowName}].onclick`,
-        `openurl('${clickUrl}', _self);`,
-      );
-    }
+    // 5. Update Interaction — render card overlay from in-memory data (no navigation)
+    const slug = lotInfo.slug;
+    krpano.set(
+      `hotspot[${shadowName}].onclick`,
+      `js(window.mapManager.openLotCard('${slug}'));`,
+    );
 
     console.log(
-      `[MapDataManager] Shadow ${shadowName}: Status="${status}" -> Forced Color=${colorHex} | ClickFallback=${!originalOnClick}`,
+      `[MapDataManager] Shadow ${shadowName}: Status="${status}" -> Color=${colorHex}`,
     );
+  }
+
+  openLotCard(slug) {
+    this.closeLotCard();
+
+    const lot = this.lotsData.find((l) => l.slug === slug);
+    if (!lot) return;
+
+    const status = (lot.status || "").toUpperCase();
+    const statusLabels = { AVAILABLE: "Disponible", RESERVED: "Reservado", SOLD: "Vendido" };
+    const statusColors = { AVAILABLE: "#28a745", RESERVED: "#ffa500", SOLD: "#ff0000" };
+    const label = statusLabels[status] || status;
+    const color = statusColors[status] || "#808080";
+    const price = Number(lot.price).toLocaleString();
+
+    // Overlay backdrop
+    const overlay = document.createElement("div");
+    overlay.id = "lot-card-overlay";
+    overlay.style.cssText = "position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;font-family:system-ui,-apple-system,sans-serif;";
+    overlay.addEventListener("click", (e) => { if (e.target === overlay) this.closeLotCard(); });
+
+    // Card
+    const card = document.createElement("div");
+    card.style.cssText = "background:#fff;border-radius:16px;width:90%;max-width:360px;box-shadow:0 25px 50px rgba(0,0,0,0.25);overflow:hidden;animation:lotCardIn .25s ease-out;";
+
+    card.innerHTML = `
+      <style>@keyframes lotCardIn{from{opacity:0;transform:translateY(20px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}</style>
+      <div style="padding:20px 24px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:44px;height:44px;border-radius:50%;background:#1a3a2a;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;">${lot.number || slug}</div>
+          <div>
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#888;">Lote N\u00b0</div>
+            <div style="display:inline-flex;align-items:center;gap:6px;margin-top:4px;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:600;color:${color};background:${color}18;border:1px solid ${color}30;">${label}</div>
+          </div>
+        </div>
+        <button id="lot-card-close" style="background:none;border:none;font-size:22px;color:#999;cursor:pointer;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .15s;" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='none'">\u2715</button>
+      </div>
+      <div style="padding:20px 24px;display:flex;gap:12px;">
+        <div style="flex:1;background:#f8faf8;border-radius:12px;padding:14px;">
+          <div style="font-size:11px;color:#888;margin-bottom:4px;">Dimensiones</div>
+          <div style="font-size:16px;font-weight:600;color:#1a3a2a;">${lot.dimensions || "-"}</div>
+        </div>
+        <div style="flex:1;background:#f8faf8;border-radius:12px;padding:14px;">
+          <div style="font-size:11px;color:#888;margin-bottom:4px;">Superficie</div>
+          <div style="font-size:16px;font-weight:600;color:#1a3a2a;">${lot.area || "-"} m\u00b2</div>
+        </div>
+      </div>
+      ${status === "AVAILABLE" ? `
+      <div style="padding:4px 24px 8px;">
+        <div style="font-size:11px;color:#888;margin-bottom:2px;">Precio</div>
+        <div style="font-size:26px;font-weight:700;color:#1a3a2a;">${lot.currency || "USD"} ${price}</div>
+      </div>` : ""}
+      ${lot.description ? `<div style="padding:4px 24px 8px;font-size:13px;color:#666;line-height:1.5;">${lot.description}</div>` : ""}
+      ${status === "AVAILABLE" ? `<div style="padding:12px 24px 20px;"><button style="width:100%;padding:12px;background:#1a3a2a;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s;" onmouseover="this.style.background='#2a5a3a'" onmouseout="this.style.background='#1a3a2a'">Consultar Ahora</button></div>` : `<div style="height:12px"></div>`}
+    `;
+
+    overlay.appendChild(card);
+    document.body.appendChild(overlay);
+
+    card.querySelector("#lot-card-close").addEventListener("click", () => this.closeLotCard());
+  }
+
+  closeLotCard() {
+    const existing = document.getElementById("lot-card-overlay");
+    if (existing) existing.remove();
+  }
+
+  computeHash(data) {
+    // Simple string hash for change detection
+    const str = JSON.stringify(data);
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = ((hash << 5) - hash + str.charCodeAt(i)) | 0;
+    }
+    return hash;
+  }
+
+  startPeriodicSync() {
+    if (this._syncTimer) return; // Already running
+    this._syncTimer = setInterval(async () => {
+      try {
+        const response = await fetch(this.apiUrl);
+        if (!response.ok) return;
+        const newData = await response.json();
+        const newHash = this.computeHash(newData);
+        if (newHash !== this.lotsHash) {
+          console.log("[MapDataManager] Re-sync: data changed, updating map.");
+          this.lotsData = newData;
+          this.lotsHash = newHash;
+          if (this.krpano) this.updateMap(this.krpano);
+        }
+      } catch (e) {
+        console.warn("[MapDataManager] Re-sync fetch failed:", e);
+      }
+    }, this.syncInterval);
   }
 }
 
 // Auto-init
 const mapManager = new MapDataManager();
+window.mapManager = mapManager;
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", () => mapManager.init());
 } else {

@@ -25,6 +25,7 @@ export async function updateLot(id: number, formData: FormData) {
 
   revalidatePath("/admin");
   revalidatePath("/card/[slug]"); // Revalidate the dynamic pages too
+  revalidatePath("/api/lots"); // Revalidate the API endpoint for map data
 }
 
 export async function login(formData: FormData) {
