@@ -85,8 +85,8 @@ function Firefly({ delay, left, size = 3 }: { delay: number; left: string; size?
         bottom: "20%",
         width: size,
         height: size,
-        background: `radial-gradient(circle, rgba(193, 124, 78, 0.9), transparent)`,
-        boxShadow: `0 0 ${size * 4}px ${size}px rgba(193, 124, 78, 0.2)`,
+        background: `radial-gradient(circle, rgba(183, 170, 140, 0.9), transparent)`,
+        boxShadow: `0 0 ${size * 4}px ${size}px rgba(183, 170, 140, 0.25)`,
       }}
       animate={{
         y: [0, -60, -120],
@@ -202,6 +202,28 @@ export default function Home() {
   /* ── Tour reveal state ── */
   const [tourRevealed, setTourRevealed] = useState(false);
 
+  /* ── Skip hero animations on back navigation ── */
+  const [isFirstVisit] = useState(() => {
+    if (typeof window === "undefined") return true;
+    const hasVisited = sessionStorage.getItem("homeAnimated");
+    if (!hasVisited) {
+      sessionStorage.setItem("homeAnimated", "true");
+      return true;
+    }
+    return false;
+  });
+
+  /* ── Lock scroll while tour is active ── */
+  useEffect(() => {
+    const cls = "tour-active";
+    if (tourRevealed) {
+      document.documentElement.classList.add(cls);
+    } else {
+      document.documentElement.classList.remove(cls);
+    }
+    return () => document.documentElement.classList.remove(cls);
+  }, [tourRevealed]);
+
   /* ── 3D tilt for CTA button ── */
   const ctaTilt = use3DTilt(8);
 
@@ -289,7 +311,7 @@ export default function Home() {
             >
               {/* Tag */}
               <motion.div
-                initial={{ opacity: 0, x: -30, rotateY: -15 }}
+                initial={isFirstVisit ? { opacity: 0, x: -30, rotateY: -15 } : false}
                 animate={{ opacity: 1, x: 0, rotateY: 0 }}
                 transition={{ duration: 1, delay: 1, ease: [0.16, 1, 0.3, 1] }}
                 className="flex items-center gap-3 mb-6"
@@ -306,7 +328,7 @@ export default function Home() {
               {/* Title — 3D clip reveal */}
               <div className="overflow-hidden preserve-3d">
                 <motion.h1
-                  initial={{ y: "110%", rotateX: 40 }}
+                  initial={isFirstVisit ? { y: "110%", rotateX: 40 } : false}
                   animate={{ y: "0%", rotateX: 0 }}
                   transition={{ duration: 1.4, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
                   className="font-heading text-[clamp(3.5rem,12vw,11rem)] font-light italic leading-[0.85] tracking-tight text-linen drop-shadow-[0_4px_30px_rgba(0,0,0,0.3)]"
@@ -316,10 +338,10 @@ export default function Home() {
               </div>
               <div className="overflow-hidden preserve-3d">
                 <motion.h1
-                  initial={{ y: "110%", rotateX: 40 }}
+                  initial={isFirstVisit ? { y: "110%", rotateX: 40 } : false}
                   animate={{ y: "0%", rotateX: 0 }}
                   transition={{ duration: 1.4, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                  className="font-heading text-[clamp(3.5rem,12vw,11rem)] font-light italic leading-[0.85] tracking-tight text-sage drop-shadow-[0_4px_30px_rgba(200,212,184,0.25)]"
+                  className="font-heading text-[clamp(3.5rem,12vw,11rem)] font-light italic leading-[0.85] tracking-tight text-sage drop-shadow-[0_4px_30px_rgba(183,170,140,0.3)]"
                 >
                   Naturaleza
                 </motion.h1>
@@ -327,7 +349,7 @@ export default function Home() {
 
               {/* Bottom bar */}
               <motion.div
-                initial={{ opacity: 0, y: 30 }}
+                initial={isFirstVisit ? { opacity: 0, y: 30 } : false}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 1.5, ease: [0.16, 1, 0.3, 1] }}
                 className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 mt-10 pt-8 border-t border-linen/15"
@@ -401,10 +423,10 @@ export default function Home() {
         <AnimatePresence>
           {!tourRevealed && (
             <motion.div
-              initial={{ opacity: 0 }}
+              initial={isFirstVisit ? { opacity: 0 } : false}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ delay: tourRevealed ? 0 : 2, duration: 1.5 }}
+              transition={{ delay: isFirstVisit && !tourRevealed ? 2 : 0, duration: 1.5 }}
               className="absolute top-6 right-6 md:top-auto md:bottom-24 md:right-12 z-20 animate-float-3d"
             >
               <div className="text-[10px] font-mono tracking-[0.2em] text-linen/20 text-right leading-loose">
@@ -429,8 +451,8 @@ export default function Home() {
                 {item}
               </span>
               <svg width="8" height="8" viewBox="0 0 8 8" className="ml-8 md:ml-14 opacity-30">
-                <circle cx="4" cy="4" r="3" fill="none" stroke="rgb(90, 110, 76)" strokeWidth="0.5"/>
-                <circle cx="4" cy="4" r="1" fill="rgb(90, 110, 76)" opacity="0.5"/>
+                <circle cx="4" cy="4" r="3" fill="none" stroke="rgb(39, 56, 38)" strokeWidth="0.5"/>
+                <circle cx="4" cy="4" r="1" fill="rgb(39, 56, 38)" opacity="0.5"/>
               </svg>
             </span>
           ))}

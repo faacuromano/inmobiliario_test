@@ -4,12 +4,23 @@ import Link from "next/link";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import { useState } from "react";
 
-export function Header() {
-  const [scrolled, setScrolled] = useState(false);
+export function Header({ forceSolid = false }: { forceSolid?: boolean }) {
+  const [scrolled, setScrolled] = useState(forceSolid);
   const { scrollY } = useScroll();
 
+  // Check if this is the first visit (for skipping animations on back navigation)
+  const [isFirstVisit] = useState(() => {
+    if (typeof window === "undefined") return true;
+    const hasVisited = sessionStorage.getItem("headerAnimated");
+    if (!hasVisited) {
+      sessionStorage.setItem("headerAnimated", "true");
+      return true;
+    }
+    return false;
+  });
+
   useMotionValueEvent(scrollY, "change", (latest) => {
-    setScrolled(latest > 80);
+    setScrolled(forceSolid || latest > 80);
   });
 
   const scrollToId = (id: string) => {
@@ -21,9 +32,9 @@ export function Header() {
 
   return (
     <motion.nav
-      initial={{ opacity: 0, y: -20 }}
+      initial={isFirstVisit ? { opacity: 0, y: -20 } : false}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 1.2, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 1.2, delay: isFirstVisit ? 0.5 : 0, ease: [0.16, 1, 0.3, 1] }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ${
         scrolled
           ? "bg-linen/80 backdrop-blur-2xl border-b border-forest/8 shadow-[0_4px_40px_0_rgba(28,43,26,0.06)]"
